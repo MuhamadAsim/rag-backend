@@ -17,16 +17,21 @@ const generateToken = (user) => {
 const signup = async (req, res) => {
   try {
     console.log("Signup request body:", req.body);
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
-    // check if user already exists
+    // ❌ Prevent signup as admin
+    if (role === "admin") {
+      return res.status(403).json({ message: "Admin accounts cannot be created via signup" });
+    }
+
+    // check if user already exists (either admin or user)
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "Email already in use" });
     }
 
-    // create new user
-    const newUser = new User({ email, password });
+    // create new user (always role=user)
+    const newUser = new User({ email, password, role: "user" });
     await newUser.save();
 
     // generate token
@@ -36,7 +41,10 @@ const signup = async (req, res) => {
       user: {
         id: newUser._id,
         email: newUser.email,
+        role: newUser.role,
         plan: newUser.plan,
+        tokens: newUser.tokens,
+        maxTokens: newUser.maxTokens,
       },
       token,
     });
@@ -46,14 +54,14 @@ const signup = async (req, res) => {
   }
 };
 
-// @desc    Signin user
+// @desc    Signin user or admin
 // @route   POST /api/auth/signin
 // @access  Public
 const signin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // check if user exists
+    // 🔹 Look for user (either admin or normal user)
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
@@ -72,9 +80,10 @@ const signin = async (req, res) => {
       user: {
         id: user._id,
         email: user.email,
+        role: user.role, // admin or user
         plan: user.plan,
-        role: "basic",
-        tokens: 1000,
+        tokens: user.tokens,
+        maxTokens: user.maxTokens,
       },
       token,
     });

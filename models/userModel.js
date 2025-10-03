@@ -22,6 +22,11 @@ const UserSchema = new Schema(
       enum: ["basic", "standard", "premium"],
       default: "basic",
     },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user", // all signups become "user" by default
+    },
   },
   { timestamps: true }
 );
