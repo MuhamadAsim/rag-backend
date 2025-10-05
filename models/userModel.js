@@ -1,3 +1,4 @@
+// models/userModel.js
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
@@ -25,8 +26,28 @@ const UserSchema = new Schema(
     role: {
       type: String,
       enum: ["user", "admin"],
-      default: "user", // all signups become "user" by default
+      default: "user",
     },
+    tokens: {
+      type: Number,
+      default: 1000, // free tier starting tokens
+    },
+    maxTokens: {
+      type: Number,
+      default: 1000,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+    },
+    verificationExpires: {
+      type: Date,
+    },
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
   },
   { timestamps: true }
 );

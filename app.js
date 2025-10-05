@@ -8,6 +8,7 @@ const { notFound, errorHandler } = require("./middleware/errorMiddleware.js");
 const authRoutes = require("./routes/authRoutes.js");
 const chatRoutes = require("./routes/chatRoutes.js");
 const fileRoutes = require("./routes/fileRoutes.js");
+const adminRoutes = require("./routes/adminRoutes.js");
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use(cors());         // Enable CORS
 app.use("/api/auth", authRoutes);
 app.use("/api/chats", chatRoutes);
 app.use("/api/files", fileRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Error handling
 app.use(notFound);
